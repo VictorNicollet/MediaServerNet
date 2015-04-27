@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Gallery</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <style>
+img {
+    display: inline;
+    margin: 8px 0 0 8px;
+    max-height: 260px;
+}
+.album { text-align: center; }
+.hide {
+    display: none;
+}
+#hide:checked + h1 + div .hide {
+    display: inline !important;
+}
+input, label {
+    float: right;
+    line-height: 32px;    
+}
+
+label {
+    margin-right: 20px;
+}
+
+#hide {
+    margin: 10px 2px;
+}
+
+h1 {
+    margin: 0;
+}
+
+.row {
+    margin-top: 30px;
+}
+    </style>
+</head>
+<body>
+    <noscript> Please enable JavaScript. </noscript>
+    <div> Invalid link, please check and try again. </div>
+    <script>
+(function() {
+    var hash = document.location.hash.replace('#', '');
+    if (!hash) return;
+    $.getJSON("/album-" + hash + "/album.json", function(data) {
+        data.root = "/album-" + hash + "/";
+        showAlbum(data);
+    });
+})();
+
+function esc(s) {
+    return s.replace('&', '&amp;')
+        .replace('<', '&lt;')
+        .replace('>', '&gt;')
+        .replace('"', '&quot;');
+}
+
+function showAlbum(album) {
+
+    var html = [
+        "<div class=container><div class=row><div class=col-sm-12>",
+        "<a class='btn btn-default' style='float:right' href='" +
+        album.root,
+        "album.zip'>Download album</a><label for=hide>Show all</label><input type=checkbox id='hide' /><h1>",
+        esc(album.Name),
+        "</h1><div class=album>"
+    ];
+
+    album.Pictures.forEach(function(p) {
+        html.push("<img src='", album.root, p.Hash, ".min.jpg' alt='", p.Name, "'", p.IsHidden ? " class='hide'" : "", "/>");
+    });
+
+    html.push('</div></div></div></div>');
+
+    $('body').html(html.join(''));
+}
+    </script>
+</body>
+</html>
