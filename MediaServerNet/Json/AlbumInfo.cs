@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace MediaServerNet.Json
 {
@@ -18,13 +19,16 @@ namespace MediaServerNet.Json
 
         /// <summary> All pictures in this album. </summary>
         [DataMember]
-        public MediaInfo[] Medias { get; private set; }
+        public MediaInfo[] Pictures { get; private set; }
+
+        [JsonConstructor]
+        private AlbumInfo() { }
 
         public AlbumInfo(string name, string hash, IEnumerable<MediaInfo> pictures)
         {
             Name = name;
             Hash = hash;
-            Medias = pictures.ToArray();
+            Pictures = pictures.ToArray();
         }
     }
 }

@@ -363,7 +363,7 @@ namespace MediaServerNet.Models
                     while (_localCopyPending > 0 && _azureDownload) 
                         await Task.Delay(500);
 
-                    var pics = _info.Medias.ToList();
+                    var pics = _info.Pictures.ToList();
                     var picsByHash = pics.Select((p, i) => new KeyValuePair<string, int>(p.Hash, i))
                         .GroupBy(kv => kv.Key)
                         .ToDictionary(g => g.Key, g => g.First().Value);
@@ -403,7 +403,7 @@ namespace MediaServerNet.Models
                         using (var zip = ZipFile.Open(zipPath, ZipArchiveMode.Create))
                         {
                             var written = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                            foreach (var file in _info.Medias)
+                            foreach (var file in _info.Pictures)
                             {
                                 if (file.IsHidden) continue;
                                 if (written.Contains(file.Name)) continue;
