@@ -18,13 +18,13 @@ namespace MediaServerNet.Json
 
         /// <summary> All pictures in this album. </summary>
         [DataMember]
-        public PictureInfo[] Pictures { get; private set; }
+        public MediaInfo[] Medias { get; private set; }
 
-        public AlbumInfo(string name, string hash, IEnumerable<PictureInfo> pictures)
+        public AlbumInfo(string name, string hash, IEnumerable<MediaInfo> pictures)
         {
             Name = name;
             Hash = hash;
-            Pictures = pictures.ToArray();
+            Medias = pictures.ToArray();
         }
     }
 }

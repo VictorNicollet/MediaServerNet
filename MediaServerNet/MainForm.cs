@@ -44,11 +44,11 @@ namespace MediaServerNet
                 _currentPhotoIndex = value;
                 if (_currentPhotoIndex < 0) _currentPhotoIndex = 0;
                 
-                CurrentPhoto = (_currentPhotoIndex < Source.PictureCount)
+                CurrentMedia = (_currentPhotoIndex < Source.PictureCount)
                     ? Source[_currentPhotoIndex]
                     : null;
 
-                if (CurrentPhoto == null)
+                if (CurrentMedia == null)
                 {
                     picture.Image = null;
                     if (Source.PictureCount == 0)
@@ -62,19 +62,19 @@ namespace MediaServerNet
                 }
                 else
                 {
-                    picture.Image = CurrentPhoto.Small;
+                    picture.Image = CurrentMedia.Small;
                     pics.Text = string.Format(@"Photo {0} / {1} · {2:F2}MB · {3}", 
                         _currentPhotoIndex + 1, 
                         Source.PictureCount,
-                        CurrentPhoto.Size / (1024.0 * 1024.0),
-                        CurrentPhoto.Hash);
+                        CurrentMedia.Size / (1024.0 * 1024.0),
+                        CurrentMedia.Hash);
                 }
 
                 EnableButtons();
             }
         }
 
-        public Photo CurrentPhoto { get; private set; }
+        public Media CurrentMedia { get; private set; }
 
         #endregion
 
@@ -115,7 +115,7 @@ namespace MediaServerNet
 
         private void EnableButtons()
         {
-            var enabled = CurrentPhoto != null && CurrentAlbum != null;
+            var enabled = CurrentMedia != null && CurrentAlbum != null;
             add.Enabled = enabled;
             hide.Enabled = enabled;
             skip.Enabled = enabled;
@@ -132,7 +132,7 @@ namespace MediaServerNet
 
         private void add_Click(object sender, EventArgs e)
         {
-            var photo = CurrentPhoto;
+            var photo = CurrentMedia;
             if (photo != null)
                 CurrentAlbum.Add(photo);            
 
@@ -141,7 +141,7 @@ namespace MediaServerNet
 
         private void hide_Click(object sender, EventArgs e)
         {
-            var photo = CurrentPhoto;
+            var photo = CurrentMedia;
             if (photo != null)
                 CurrentAlbum.Add(photo, true);            
 
@@ -164,19 +164,19 @@ namespace MediaServerNet
 
         private void left_Click(object sender, EventArgs e)
         {
-            if (CurrentPhoto != null)
+            if (CurrentMedia != null)
             {
-                CurrentPhoto.RotateLeft();
-                picture.Image = CurrentPhoto.Small;
+                CurrentMedia.RotateLeft();
+                picture.Image = CurrentMedia.Small;
             }
         }
 
         private void right_Click(object sender, EventArgs e)
         {
-            if (CurrentPhoto != null)
+            if (CurrentMedia != null)
             {
-                CurrentPhoto.RotateRight();
-                picture.Image = CurrentPhoto.Small;
+                CurrentMedia.RotateRight();
+                picture.Image = CurrentMedia.Small;
             }
         }
 

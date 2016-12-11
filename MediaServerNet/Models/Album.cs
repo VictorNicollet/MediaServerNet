@@ -298,41 +298,40 @@ namespace MediaServerNet.Models
             Name = Path.GetFileName(_path);
             if (Name == null) throw new ArgumentException(@"Path with no filename", _path);
 
-            _info = new AlbumInfo(Name, Hash, new PictureInfo[0]);
+            _info = new AlbumInfo(Name, Hash, new MediaInfo[0]);
 
             Task.Run(() => StartAzureSync(_cts.Token));
         }
 
-
-        #region Adding photos to the album
+        #region Adding medias to the album
 
         /// <summary> Pictures added to the album on this iteration. </summary>
-        private readonly ConcurrentQueue<PictureInfo> _newPictures = new ConcurrentQueue<PictureInfo>();
+        private readonly ConcurrentQueue<MediaInfo> _newMedias = new ConcurrentQueue<MediaInfo>();
 
-        public void Add(Photo photo, bool hidden = false)
+        public void Add(Media media, bool hidden = false)
         {
-            _newPictures.Enqueue(new PictureInfo(
-                photo.Filename,
-                photo.Hash,
+            _newMedias.Enqueue(new MediaInfo(
+                media.Filename,
+                media.Hash,
                 hidden));
 
             Interlocked.Increment(ref _localCopyPending);
 
             Task.Run(() =>
             {
-                var originalPath = Path.Combine(_path, photo.Hash + ".jpg");
-                var smallPath = Path.Combine(_path, photo.Hash + ".min.jpg");
+                var originalPath = Path.Combine(_path, media.Hash + ".jpg");
+                var smallPath = Path.Combine(_path, media.Hash + ".min.jpg");
 
                 _toUpload.Enqueue(originalPath);
                 _toUpload.Enqueue(smallPath);
 
                 if (!File.Exists(originalPath)) 
                     using (var s = File.OpenWrite(originalPath))
-                        photo.WriteOriginal(s);
+                        media.WriteOriginal(s);
 
                 if (!File.Exists(smallPath))
                     using (var s = File.OpenWrite(smallPath))
-                        photo.WriteSmall(s);
+                        media.WriteSmall(s);
 
                 Interlocked.Decrement(ref _localCopyPending);
             });
@@ -363,13 +362,13 @@ namespace MediaServerNet.Models
                     while (_localCopyPending > 0 && _azureDownload) 
                         await Task.Delay(500);
 
-                    var pics = _info.Pictures.ToList();
+                    var pics = _info.Medias.ToList();
                     var picsByHash = pics.Select((p, i) => new KeyValuePair<string, int>(p.Hash, i))
                         .GroupBy(kv => kv.Key)
                         .ToDictionary(g => g.Key, g => g.First().Value);
 
-                    PictureInfo next;
-                    while (_newPictures.TryDequeue(out next))
+                    MediaInfo next;
+                    while (_newMedias.TryDequeue(out next))
                     {
                         int pos;
                         if (!picsByHash.TryGetValue(next.Hash, out pos))
@@ -403,7 +402,7 @@ namespace MediaServerNet.Models
                         using (var zip = ZipFile.Open(zipPath, ZipArchiveMode.Create))
                         {
                             var written = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                            foreach (var file in _info.Pictures)
+                            foreach (var file in _info.Medias)
                             {
                                 if (file.IsHidden) continue;
                                 if (written.Contains(file.Name)) continue;

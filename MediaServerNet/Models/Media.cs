@@ -9,7 +9,7 @@ using System.Text;
 namespace MediaServerNet.Models
 {
     /// <summary> Represents a photo loaded from an on-disk file or remote location. </summary>
-    public sealed class Photo
+    public sealed class Media
     {
         /// <summary> The source path. </summary>
         private readonly string _path;
@@ -40,7 +40,7 @@ namespace MediaServerNet.Models
         }
 
         /// <summary> Load the photo from an on-disk path. </summary>
-        public Photo(string path)
+        public Media(string path)
         {
             _path = path;
             Filename = Path.GetFileName(path);

@@ -46,13 +46,13 @@ namespace MediaServerNet.Models
         }
 
         /// <summary> Return the photo at the specified location, from cache if possible. </summary>
-        private Photo PhotoAt(int i)
+        private Media PhotoAt(int i)
         {
             return _contents.GetOrAdd(i, j =>
             {
                 try
                 {
-                    return new Photo(Path.Combine(FromPath, _pictureNames[j]));
+                    return new Media(Path.Combine(FromPath, _pictureNames[j]));
                 }
                 catch
                 {
@@ -62,11 +62,11 @@ namespace MediaServerNet.Models
         }
 
         /// <summary> A cache of all photos in this dictionary. </summary>
-        private readonly ConcurrentDictionary<int, Photo> _contents = 
-            new ConcurrentDictionary<int, Photo>();
+        private readonly ConcurrentDictionary<int, Media> _contents = 
+            new ConcurrentDictionary<int, Media>();
 
         /// <summary> Return the photo at the specified location, from cache if possible. </summary>
-        public Photo this[int i]
+        public Media this[int i]
         {
             get
             {

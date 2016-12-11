@@ -3,7 +3,7 @@
 namespace MediaServerNet.Json
 {
     [DataContract]
-    public sealed class PictureInfo
+    public sealed class MediaInfo
     {
         /// <summary> The filename of the picture. </summary>
         [DataMember]
@@ -17,7 +17,7 @@ namespace MediaServerNet.Json
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         public bool IsHidden { get; private set; }
 
-        public PictureInfo(string name, string hash, bool isHidden)
+        public MediaInfo(string name, string hash, bool isHidden)
         {
             Name = name;
             Hash = hash;
