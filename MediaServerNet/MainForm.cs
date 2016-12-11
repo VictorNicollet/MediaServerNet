@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using MediaServerNet.Models;
 
@@ -6,7 +7,7 @@ namespace MediaServerNet
 {
     public partial class MainForm : Form
     {
-        #region Image source
+        #region Media source
 
         private FileSource _source;
 
@@ -17,7 +18,7 @@ namespace MediaServerNet
             {
                 _source = value;
                 Text = _source.FromPath;
-                CurrentPhotoIndex = 0;
+                CurrentIndex = 0;
             }
         }
 
@@ -32,42 +33,35 @@ namespace MediaServerNet
 
         #endregion
 
-        #region Image processing
+        #region Media processing
 
-        private int _currentPhotoIndex;
+        private int _currentIndex;
 
-        public int CurrentPhotoIndex
+        public int CurrentIndex
         {
-            get { return _currentPhotoIndex; }
+            get { return _currentIndex; }
             set
             {
-                _currentPhotoIndex = value;
-                if (_currentPhotoIndex < 0) _currentPhotoIndex = 0;
+                var i = _currentIndex = value;
+                if (_currentIndex < 0) _currentIndex = 0;
                 
-                CurrentMedia = (_currentPhotoIndex < Source.PictureCount)
-                    ? Source[_currentPhotoIndex]
+                CurrentMedia = i < Source.PictureCount
+                    ? Source[i]
                     : null;
 
                 if (CurrentMedia == null)
                 {
-                    picture.Image = null;
-                    if (Source.PictureCount == 0)
-                    {
-                        pics.Text = @"No photos found";
-                    }
-                    else
-                    {
-                        pics.Text = string.Format(@"Photo {0} / {1} · load error", _currentPhotoIndex + 1, Source.PictureCount);
-                    }
+                    media.Image = null;
+                    medias.Text = Source.PictureCount == 0 
+                        ? @"No media found" 
+                        : $@"Media {i + 1} / {Source.PictureCount} · load error";
                 }
                 else
                 {
-                    picture.Image = CurrentMedia.Small;
-                    pics.Text = string.Format(@"Photo {0} / {1} · {2:F2}MB · {3}", 
-                        _currentPhotoIndex + 1, 
-                        Source.PictureCount,
-                        CurrentMedia.Size / (1024.0 * 1024.0),
-                        CurrentMedia.Hash);
+                    const double mb = 1024.0*1024.0;
+                    media.Image = CurrentMedia.Small;
+                    medias.Text =
+                        $@"Media {i + 1} / {Source.PictureCount} · {CurrentMedia.Size/mb:F2}MB · {CurrentMedia.Hash} · {Path.GetFileName(CurrentMedia.Filename)}";
                 }
 
                 EnableButtons();
@@ -87,8 +81,7 @@ namespace MediaServerNet
             get { return _currentAlbum; }
             private set
             {
-                if (_currentAlbum != null)                
-                    _currentAlbum.Disconnect();
+                _currentAlbum?.Disconnect();
 
                 _currentAlbum = value;
                 _currentAlbum.Progress += CurrentAlbumOnProgress;
@@ -101,13 +94,11 @@ namespace MediaServerNet
         {
             Invoke((MethodInvoker)delegate
             {
+                const double mb = 1024.0*1024.0;
                 progress.Maximum = (int)(a.TotalBytesExpected/10240);
                 progress.Value = (int)(a.TotalBytesSofar/10240);
-                transfer.Text = string.Format(
-                    "{0:F2} / {1:F2} MB · {2}",
-                    a.TotalBytesSofar/(1024.0*1024.0),
-                    a.TotalBytesExpected/(1024.0*1024.0),
-                    a.Status);
+                transfer.Text =
+                    $"{a.TotalBytesSofar/mb:F2} / {a.TotalBytesExpected/mb:F2} MB · {a.Status}";
             });
         }
 
@@ -121,7 +112,7 @@ namespace MediaServerNet
             skip.Enabled = enabled;
             left.Enabled = enabled;
             right.Enabled = enabled;
-            save.Enabled = (CurrentAlbum != null);
+            save.Enabled = CurrentAlbum != null;
         }
 
         public MainForm()
@@ -136,7 +127,7 @@ namespace MediaServerNet
             if (photo != null)
                 CurrentAlbum.Add(photo);            
 
-            ++CurrentPhotoIndex;            
+            ++CurrentIndex;            
         }
 
         private void hide_Click(object sender, EventArgs e)
@@ -145,12 +136,12 @@ namespace MediaServerNet
             if (photo != null)
                 CurrentAlbum.Add(photo, true);            
 
-            ++CurrentPhotoIndex;
+            ++CurrentIndex;
         }
 
         private void skip_Click(object sender, EventArgs e)
         {
-            ++CurrentPhotoIndex;
+            ++CurrentIndex;
         }
 
         private void album_Click(object sender, EventArgs e)
@@ -167,7 +158,7 @@ namespace MediaServerNet
             if (CurrentMedia != null)
             {
                 CurrentMedia.RotateLeft();
-                picture.Image = CurrentMedia.Small;
+                media.Image = CurrentMedia.Small;
             }
         }
 
@@ -176,14 +167,13 @@ namespace MediaServerNet
             if (CurrentMedia != null)
             {
                 CurrentMedia.RotateRight();
-                picture.Image = CurrentMedia.Small;
+                media.Image = CurrentMedia.Small;
             }
         }
 
         private void save_Click(object sender, EventArgs e)
         {
-            if (CurrentAlbum != null)
-                CurrentAlbum.SaveToDisk();
+            CurrentAlbum?.SaveToDisk();
         }
     }
 }

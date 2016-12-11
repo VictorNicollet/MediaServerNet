@@ -13,15 +13,20 @@ namespace MediaServerNet.Json
         [DataMember]
         public string Hash { get; private set; }
 
+        /// <summary> Is this a playable movie ?  </summary>
+        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        public bool IsMovie { get; private set; }
+
         /// <summary> Is this picture hidden ?  </summary>
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         public bool IsHidden { get; private set; }
 
-        public MediaInfo(string name, string hash, bool isHidden)
+        public MediaInfo(string name, string hash, bool isHidden, bool isMovie)
         {
             Name = name;
             Hash = hash;
             IsHidden = isHidden;
+            IsMovie = isMovie;
         }
     }
 }

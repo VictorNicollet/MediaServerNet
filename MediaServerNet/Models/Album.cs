@@ -313,13 +313,14 @@ namespace MediaServerNet.Models
             _newMedias.Enqueue(new MediaInfo(
                 media.Filename,
                 media.Hash,
-                hidden));
+                hidden, 
+                media is Movie));
 
             Interlocked.Increment(ref _localCopyPending);
 
             Task.Run(() =>
             {
-                var originalPath = Path.Combine(_path, media.Hash + ".jpg");
+                var originalPath = Path.Combine(_path, media.Hash + media.Extension);
                 var smallPath = Path.Combine(_path, media.Hash + ".min.jpg");
 
                 _toUpload.Enqueue(originalPath);
@@ -331,7 +332,7 @@ namespace MediaServerNet.Models
 
                 if (!File.Exists(smallPath))
                     using (var s = File.OpenWrite(smallPath))
-                        media.WriteSmall(s);
+                        media.WriteThumbnail(s);
 
                 Interlocked.Decrement(ref _localCopyPending);
             });
@@ -408,7 +409,7 @@ namespace MediaServerNet.Models
                                 if (written.Contains(file.Name)) continue;
                                 written.Add(file.Name);
 
-                                var source = Path.Combine(_path, file.Hash + ".jpg");
+                                var source = Path.Combine(_path, file.Hash + (file.IsMovie ? ".mov" : ".jpg"));
                                 zip.CreateEntryFromFile(source, file.Name, CompressionLevel.NoCompression);
                             }
                         }

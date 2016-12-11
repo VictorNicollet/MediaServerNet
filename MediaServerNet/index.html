@@ -72,7 +72,9 @@ function showAlbum(album) {
     ];
 
     album.Pictures.forEach(function(p) {
-        html.push("<img src='", album.root, p.Hash, ".min.jpg' alt='", p.Name, "'", p.IsHidden ? " class='hide'" : "", "/>");
+        html.push("<a href='", album.root, p.Hash, (p.IsMovie || false) ? ".mov" : ".jpg",
+            "'><img src='", album.root, p.Hash, ".min.jpg' alt='", p.Name, "'", p.IsHidden ? " class='hide'" : "",
+            "/></a>");
     });
 
     html.push('</div></div></div></div>');

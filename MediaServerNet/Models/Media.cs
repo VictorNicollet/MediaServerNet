@@ -9,7 +9,7 @@ using System.Text;
 namespace MediaServerNet.Models
 {
     /// <summary> Represents a photo loaded from an on-disk file or remote location. </summary>
-    public sealed class Media
+    public abstract class Media
     {
         /// <summary> The source path. </summary>
         private readonly string _path;
@@ -28,24 +28,29 @@ namespace MediaServerNet.Models
         /// <summary> The name of the file. </summary>
         public readonly string Filename;
 
+        /// <summary> The extension of the file. </summary>
+        public abstract string Extension { get; }
+
         public void WriteOriginal(Stream stream)
         {
             using (var input = File.OpenRead(_path))
                 input.CopyTo(stream);
         }
 
-        public void WriteSmall(Stream stream)
+        public void WriteThumbnail(Stream stream)
         {
             Small.Save(stream, ImageFormat.Jpeg);
         }
-
+        
         /// <summary> Load the photo from an on-disk path. </summary>
-        public Media(string path)
+        protected Media(string path, Image small)
         {
             _path = path;
-            Filename = Path.GetFileName(path);
+            Filename = Path.GetFileName(path);            
             if (Filename == null) 
                 throw new ArgumentException(@"Filename needed", path);
+
+            Small = small;
 
             using (var file = File.OpenRead(path))
             {
@@ -55,28 +60,50 @@ namespace MediaServerNet.Models
                 Hash = sb.ToString();
                 Size = file.Length;
             }
-
-            using (var file = File.OpenRead(path))
-            {
-                var original = Image.FromStream(file);
-                var ow = original.Width;
-                var oh = original.Height;
-
-                int sw, sh;
-                if (ow > oh)
-                {
-                    sw = MaxSmallDimension;
-                    sh = oh*MaxSmallDimension/ow;
-                }
-                else
-                {
-                    sh = MaxSmallDimension;
-                    sw = ow*MaxSmallDimension/oh;
-                }
-
-                Small = ResizeImage(original, sw, sh);
-            }
         }
+
+        public void RotateLeft()
+        {
+            Small?.RotateFlip(RotateFlipType.Rotate270FlipNone);
+        }
+
+        public void RotateRight()
+        {
+            Small?.RotateFlip(RotateFlipType.Rotate90FlipNone);
+        }
+
+        /// <summary> Load the media at the specified path. </summary>        
+        public static Media Load(string path)
+        {
+            if (path.EndsWith(".mov", StringComparison.OrdinalIgnoreCase))
+                return Movie.Make(path);
+
+            return Photo.Make(path);
+        }
+
+        public static Image Smaller(Stream input)
+        {
+            var original = Image.FromStream(input);
+            input.Close();
+
+            var ow = original.Width;
+            var oh = original.Height;
+
+            int sw, sh;
+            if (ow > oh)
+            {
+                sw = MaxSmallDimension;
+                sh = oh * MaxSmallDimension / ow;
+            }
+            else
+            {
+                sh = MaxSmallDimension;
+                sw = ow * MaxSmallDimension / oh;
+            }
+
+            return ResizeImage(original, sw, sh);
+        }
+
 
         private static Bitmap ResizeImage(Image image, int width, int height)
         {
@@ -103,16 +130,5 @@ namespace MediaServerNet.Models
             return destImage;
         }
 
-        public void RotateLeft()
-        {
-            if (Small != null)
-                Small.RotateFlip(RotateFlipType.Rotate270FlipNone);
-        }
-
-        public void RotateRight()
-        {
-            if (Small != null)
-                Small.RotateFlip(RotateFlipType.Rotate90FlipNone);
-        }
     }
 }

@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.picture = new System.Windows.Forms.PictureBox();
+            this.media = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.skip = new System.Windows.Forms.Button();
             this.album = new System.Windows.Forms.Button();
@@ -37,28 +37,28 @@
             this.changeDir = new System.Windows.Forms.Button();
             this.browse = new System.Windows.Forms.FolderBrowserDialog();
             this.status = new System.Windows.Forms.StatusStrip();
-            this.pics = new System.Windows.Forms.ToolStripStatusLabel();
+            this.medias = new System.Windows.Forms.ToolStripStatusLabel();
             this.progress = new System.Windows.Forms.ToolStripProgressBar();
             this.transfer = new System.Windows.Forms.ToolStripStatusLabel();
             this.right = new System.Windows.Forms.Button();
             this.left = new System.Windows.Forms.Button();
             this.save = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.picture)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.media)).BeginInit();
             this.panel1.SuspendLayout();
             this.status.SuspendLayout();
             this.SuspendLayout();
             // 
             // picture
             // 
-            this.picture.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.media.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.picture.Location = new System.Drawing.Point(12, 37);
-            this.picture.Name = "picture";
-            this.picture.Size = new System.Drawing.Size(1156, 522);
-            this.picture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.picture.TabIndex = 0;
-            this.picture.TabStop = false;
+            this.media.Location = new System.Drawing.Point(12, 37);
+            this.media.Name = "media";
+            this.media.Size = new System.Drawing.Size(1156, 522);
+            this.media.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.media.TabIndex = 0;
+            this.media.TabStop = false;
             // 
             // panel1
             // 
@@ -138,7 +138,7 @@
             // status
             // 
             this.status.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pics,
+            this.medias,
             this.progress,
             this.transfer});
             this.status.Location = new System.Drawing.Point(0, 549);
@@ -149,9 +149,9 @@
             // 
             // pics
             // 
-            this.pics.Name = "pics";
-            this.pics.Size = new System.Drawing.Size(98, 17);
-            this.pics.Text = "No photos found";
+            this.medias.Name = "medias";
+            this.medias.Size = new System.Drawing.Size(98, 17);
+            this.medias.Text = "No photos found";
             // 
             // progress
             // 
@@ -201,10 +201,10 @@
             this.ClientSize = new System.Drawing.Size(1180, 571);
             this.Controls.Add(this.status);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.picture);
+            this.Controls.Add(this.media);
             this.Name = "MainForm";
             this.Text = "MediaServer.Net";
-            ((System.ComponentModel.ISupportInitialize)(this.picture)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.media)).EndInit();
             this.panel1.ResumeLayout(false);
             this.status.ResumeLayout(false);
             this.status.PerformLayout();
@@ -215,7 +215,7 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox picture;
+        private System.Windows.Forms.PictureBox media;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button changeDir;
         private System.Windows.Forms.Button hide;
@@ -224,7 +224,7 @@
         private System.Windows.Forms.Button skip;
         private System.Windows.Forms.FolderBrowserDialog browse;
         private System.Windows.Forms.StatusStrip status;
-        private System.Windows.Forms.ToolStripStatusLabel pics;
+        private System.Windows.Forms.ToolStripStatusLabel medias;
         private System.Windows.Forms.ToolStripProgressBar progress;
         private System.Windows.Forms.ToolStripStatusLabel transfer;
         private System.Windows.Forms.Button left;

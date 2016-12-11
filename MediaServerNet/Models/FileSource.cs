@@ -14,10 +14,10 @@ namespace MediaServerNet.Models
         public readonly string FromPath;
 
         /// <summary> The number of pictures in the directory. </summary>
-        public int PictureCount { get { return _pictureNames.Count; } }
+        public int PictureCount => _mediaNames.Count;
 
         /// <summary> The names of the pictures in the directory. </summary>
-        private readonly IReadOnlyList<string> _pictureNames;
+        private readonly IReadOnlyList<string> _mediaNames;
 
         public FileSource(string fromPath)
         {
@@ -25,34 +25,35 @@ namespace MediaServerNet.Models
 
             try
             {
-                _pictureNames = Directory.EnumerateFiles(fromPath)
+                _mediaNames = Directory.EnumerateFiles(fromPath)
                     .Where(file => 
                         file.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || 
-                        file.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+                        file.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                        file.EndsWith(".mov", StringComparison.OrdinalIgnoreCase))
                     .ToArray();
             }
             catch
             {
-                _pictureNames = new string[0];
+                _mediaNames = new string[0];
             }
 
             Task.Run(() =>
             {
-                for (var i = 0; i < _pictureNames.Count; ++i)
+                for (var i = 0; i < _mediaNames.Count; ++i)
                 {
-                    PhotoAt(i);
+                    MediaAt(i);
                 }
             });
         }
 
         /// <summary> Return the photo at the specified location, from cache if possible. </summary>
-        private Media PhotoAt(int i)
+        private Media MediaAt(int i)
         {
             return _contents.GetOrAdd(i, j =>
             {
                 try
                 {
-                    return new Media(Path.Combine(FromPath, _pictureNames[j]));
+                    return Media.Load(Path.Combine(FromPath, _mediaNames[j]));
                 }
                 catch
                 {
@@ -66,12 +67,6 @@ namespace MediaServerNet.Models
             new ConcurrentDictionary<int, Media>();
 
         /// <summary> Return the photo at the specified location, from cache if possible. </summary>
-        public Media this[int i]
-        {
-            get
-            {
-                return PhotoAt(i);
-            }
-        }
+        public Media this[int i] => MediaAt(i);
     }
 }
